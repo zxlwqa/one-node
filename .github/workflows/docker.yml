@@ -42,7 +42,7 @@ jobs:
           context: ./hugging-face
           push: true
           tags: |
-            ghcr.io/zxlwq/zxlwq:latest
-            ${{ secrets.DOCKER_USERNAME }}/zxlwq:latest
+            ghcr.io/zxlwq/lwq:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/lwq:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
