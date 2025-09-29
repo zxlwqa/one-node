@@ -1,4 +1,5 @@
 from io import BytesIO
+import os
 import random
 import string
 import sys
@@ -6,9 +7,15 @@ import argparse
 from huggingface_hub import HfApi
 
 parser = argparse.ArgumentParser(description="自动创建 Hugging Face Space 并注入 Secrets")
-parser.add_argument("--token", type=str, required=True, help="Hugging Face的Token，需要写权限")
-parser.add_argument("--uuid", type=str, default="8c8fe996-85aa-4555-84ae-d5ec03db2912", help="UUID（可选）")
-parser.add_argument("--image", type=str, default="ghcr.io/zxlwqa/lwq:latest", help="Docker 镜像地址（可选）")
+parser.add_argument(
+    "--token",
+    type=str,
+    required=True,
+    help="Token需要写权限",
+)
+parser.add_argument("--image", help="Docker镜像地址", default="")
+parser.add_argument("--uuid", help="UUID", default="")
+
 args = parser.parse_args()
 
 
@@ -35,11 +42,11 @@ if __name__ == "__main__":
         sys.exit(1)
     userid = user_info["name"]
 
-    # 镜像和 UUID，使用默认值
-    image = args.image
-    uuid = args.uuid
+    # 镜像和 UUID
+    image = args.image or "ghcr.io/zxlwqa/lwq:latest"
+    uuid = args.uuid or "8c8fe996-85aa-4555-84ae-d5ec03db2912"
 
-    # 随机 Space 名并创建
+    # 生成随机 Space 名并创建
     space_name = generate_random_string(6)
     repoid = f"{userid}/{space_name}"
     api.create_repo(
