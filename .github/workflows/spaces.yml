@@ -39,9 +39,9 @@ jobs:
         run: |
           python -V
 
-      - name: 运行 space.py
+      - name: 运行 spaces.py
         run: |
-          python space.py \
+          python spaces.py \
             --token "${{ github.event.inputs.Token }}" \
             --uuid "${{ github.event.inputs.uuid }}" \
             --image "${{ github.event.inputs.Image }}"
