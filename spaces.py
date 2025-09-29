@@ -6,7 +6,7 @@ import sys
 import argparse
 from huggingface_hub import HfApi
 
-parser = argparse.ArgumentParser(description="自动创建 Hugging Face Space 并注入 Secrets")
+parser = argparse.ArgumentParser(description="自动创建Space并注入Secrets")
 parser.add_argument(
     "--token",
     type=str,
@@ -19,8 +19,10 @@ parser.add_argument("--uuid", help="UUID", default="")
 args = parser.parse_args()
 
 
-def generate_random_string(length=8):
-    """生成随机字符串，至少含一个字母"""
+def generate_random_string(length=3):
+    """生成随机字符串"""
+    if length < 1:
+        length = 1
     chars = string.ascii_letters + string.digits
     mandatory_letter = random.choice(string.ascii_letters)
     remaining_chars = random.choices(chars, k=length - 1)
@@ -46,8 +48,8 @@ if __name__ == "__main__":
     image = args.image or "ghcr.io/zxlwqa/lwq:latest"
     uuid = args.uuid or "8c8fe996-85aa-4555-84ae-d5ec03db2912"
 
-    # 生成随机 Space 名并创建
-    space_name = generate_random_string(6)
+    # 生成随机Space名并创建
+    space_name = generate_random_string(3)
     repoid = f"{userid}/{space_name}"
     api.create_repo(
         repo_id=repoid,
