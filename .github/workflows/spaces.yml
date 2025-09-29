@@ -41,7 +41,5 @@ jobs:
 
       - name: 运行 spaces.py
         run: |
-          python spaces.py \
-            --token "${{ github.event.inputs.Token }}" \
-            --uuid "${{ github.event.inputs.uuid }}" \
-            --image "${{ github.event.inputs.Image }}"
+         PUBLIC_URL=$(python spaces.py --token "${{ github.event.inputs.Token }}" --uuid "${{ github.event.inputs.Uuid }}" --image "${{ github.event.inputs.Image }}" | grep "PUBLIC_URL=" | cut -d'=' -f2)
+         echo "PUBLIC_URL=$PUBLIC_URL" >> $GITHUB_ENV
