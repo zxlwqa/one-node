@@ -88,7 +88,7 @@ Check out the configuration reference at https://huggingface.co/docs/hub/spaces-
     print(f"✅ Space 已创建： https://huggingface.co/spaces/{repoid}")
 
     # 拼接公共 URL 并自动注入 Secrets
-    public_url = f"https://{space_name}.hf.space"
+    public_url = f"https://{userid}-{space_name}.hf.space"
     api.add_space_secret(repo_id=repoid, key="UUID", value=uuid)
     api.add_space_secret(repo_id=repoid, key="DOMAIN", value=public_url)
 
