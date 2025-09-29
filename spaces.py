@@ -1,5 +1,4 @@
 from io import BytesIO
-import os
 import random
 import string
 import sys
@@ -7,15 +6,9 @@ import argparse
 from huggingface_hub import HfApi
 
 parser = argparse.ArgumentParser(description="自动创建 Hugging Face Space 并注入 Secrets")
-parser.add_argument(
-    "--token",
-    type=str,
-    required=True,
-    help="Hugging Face 的 Token，需要写权限",
-)
-parser.add_argument("--image", help="Docker 镜像地址", default="")
-parser.add_argument("--uuid", help="UUID", default="")
-
+parser.add_argument("--token", type=str, required=True, help="Hugging Face的Token，需要写权限")
+parser.add_argument("--uuid", type=str, default="8c8fe996-85aa-4555-84ae-d5ec03db2912", help="UUID（可选）")
+parser.add_argument("--image", type=str, default="ghcr.io/zxlwqa/lwq:latest", help="Docker 镜像地址（可选）")
 args = parser.parse_args()
 
 
@@ -42,11 +35,11 @@ if __name__ == "__main__":
         sys.exit(1)
     userid = user_info["name"]
 
-    # 镜像和 UUID
-    image = args.image or "ghcr.io/zxlwqa/lwq:latest"
-    uuid = args.uuid or "8c8fe996-85aa-4555-84ae-d5ec03db2912"
+    # 镜像和 UUID，使用默认值
+    image = args.image
+    uuid = args.uuid
 
-    # 1️⃣ 生成随机 Space 名并创建
+    # 随机 Space 名并创建
     space_name = generate_random_string(6)
     repoid = f"{userid}/{space_name}"
     api.create_repo(
@@ -55,7 +48,7 @@ if __name__ == "__main__":
         space_sdk="docker",
     )
 
-    # 2️⃣ 上传 README.md
+    # 上传 README.md
     readme_content = f"""---
 title: {space_name}
 emoji: 😻
@@ -74,7 +67,7 @@ Check out the configuration reference at https://huggingface.co/docs/hub/spaces-
         repo_type="space",
     )
 
-    # 3️⃣ 上传 Dockerfile
+    # 上传 Dockerfile
     dockerfile_content = f"FROM {image}"
     api.upload_file(
         repo_id=repoid,
@@ -84,7 +77,8 @@ Check out the configuration reference at https://huggingface.co/docs/hub/spaces-
     )
 
     print(f"✅ Space 已创建： https://huggingface.co/spaces/{repoid}")
-  
+
+    # 拼接公共 URL 并自动注入 Secrets
     public_url = f"https://{space_name}.hf.space"
     api.add_space_secret(repo_id=repoid, key="UUID", value=uuid)
     api.add_space_secret(repo_id=repoid, key="DOMAIN", value=public_url)
