@@ -92,4 +92,9 @@ Check out the configuration reference at https://huggingface.co/docs/hub/spaces-
     api.add_space_secret(repo_id=repoid, key="UUID", value=uuid)
     api.add_space_secret(repo_id=repoid, key="DOMAIN", value=public_url)
 
+    # 输出信息
+    print(f"✅ Space 已创建： https://huggingface.co/spaces/{repoid}")
     print(f"✅ 已注入 Secrets：UUID={uuid}, DOMAIN={public_url}")
+
+    # 输出公共 URL，GitHub Actions 可以捕获
+    print(f"PUBLIC_URL={public_url}")
