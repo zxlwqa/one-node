@@ -12,29 +12,52 @@
 (function() {
     'use strict';
 
-    const TARGET_TEXT_SELECTOR = 'body > div:nth-child(8) > main:nth-child(4) > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1)';
-    const BUTTON_A_SELECTOR = 'body > div:nth-child(8) > main:nth-child(4) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > button:nth-child(2)';
-    const BUTTON_B_SELECTOR = 'body > div:nth-child(8) > main:nth-child(4) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > button:nth-child(3)';
+    const FILE_A = 'docker-compose.yml';
+    const FILE_B = 'node.txt';
+
+    // 查找页面上文本内容（去除空白后）严格等于指定文字的"叶子"元素
+    // 只取没有子元素的节点，避免重复匹配到父容器
+    function findElementsByExactText(text) {
+        const result = [];
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+        let node;
+        while ((node = walker.nextNode())) {
+            if (node.children.length === 0 && node.textContent.trim() === text) {
+                result.push(node);
+            }
+        }
+        return result;
+    }
+
+    // 找到文字所对应的可点击元素，优先向上找最近的 button / a / role=button
+    function findClickTarget(text) {
+        const elements = findElementsByExactText(text);
+        for (const el of elements) {
+            let current = el;
+            while (current && current !== document.body) {
+                const tag = current.tagName.toLowerCase();
+                const role = current.getAttribute && current.getAttribute('role');
+                if (tag === 'button' || tag === 'a' || role === 'button' || role === 'link') {
+                    return current;
+                }
+                current = current.parentElement;
+            }
+        }
+        return elements[0] || null;
+    }
 
     function runTask() {
+        const aCount = findElementsByExactText(FILE_A).length;
 
-        const textElement = document.querySelector(TARGET_TEXT_SELECTOR);
-
-        if (!textElement) {
-            return;
-        }
-
-        const content = textElement.textContent.trim();
-        let btnToClick = null;
-
-        if (content === 'docker-compose.yml') {
-            btnToClick = document.querySelector(BUTTON_B_SELECTOR);
+        let target = null;
+        if (aCount > 1) {
+            target = findClickTarget(FILE_B);
         } else {
-            btnToClick = document.querySelector(BUTTON_A_SELECTOR);
+            target = findClickTarget(FILE_A);
         }
 
-        if (btnToClick) {
-            btnToClick.click();
+        if (target) {
+            target.click();
         }
     }
 
